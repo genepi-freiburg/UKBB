@@ -55,6 +55,8 @@ if not excludeListPath:
 	args.exclude = excludeListPath
 
 
+
+#### print out chosen options
 print ("Chosen options")
 for arg in vars(args):
     print ("\t--"+arg, getattr(args, arg))
@@ -260,8 +262,8 @@ def writeOutPhenoFile(outFileDict, excludeList):
 			outLine += "\t" + "\t".join(curList)
 
 
-		if (len(outLine.split("\t")) != 54):
-			print (patId)
+		# if (len(outLine.split("\t")) != 54):
+		# 	print (patId)
 			# print (outLine.split("\t"))
 
 		fileOut.write(outLine + "\n")

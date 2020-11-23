@@ -14,13 +14,14 @@ from pathlib import Path
 ######## fix variables, pathes and tools ########
 #################################################
 
-#### imputed data
-impPath = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/EGAD00010001474/"
-impSampleFile = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/UKBB_500k_v3_clean.sample"
-
+#### program pathes
 bgenixPath = "/data/programs/bin/gwas/bgenix/bgenix"
 qcToolPath = "/data/programs/bin/gwas/qctool/qctool_v2.0.1/qctool_v2.0.1"
 
+
+#### imputed data
+impPath = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/EGAD00010001474/"
+impSampleFile = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/UKBB_500k_v3_clean.sample"
 
 #### genotyped data
 genoPath = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/EGAD00010001497/"
@@ -32,9 +33,12 @@ plinkPath = "/data/programs/bin/gwas/plink/plink-2.0.0_alpha_20190724/plink2"
 
 #### WES data
 wesDataPath = "/data/studies/06_UKBB/Exome_50k/01_Raw_Data/EFE/"
-wesBedFile =  wesDataPath + "ukb_efe_chr1_v1.bed"
-wesBimFile =  wesDataPath + "ukb_fe_exm_chrall_v1.bim"
+# wesDataPath = "/data/studies/06_UKBB/Exome_200k/02_Genotypes/BGEN_Format/output/"
+wesBedFile = wesDataPath + "ukb_efe_chr1_v1.bed"
+wesBimFile = wesDataPath + "ukb_fe_exm_chrall_v1.bim"
 wesFamFile = wesDataPath + "ukb20272_efe_chr1_v1_s49959.fam"
+
+wesPath = "/data/studies/06_UKBB/Exome_200k/02_Genotypes/BGEN_Format/output"
 
 
 
@@ -45,7 +49,7 @@ wesFamFile = wesDataPath + "ukb20272_efe_chr1_v1_s49959.fam"
 #########################################
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-v", "--variantFile", help = "Path of input file containing chr and variant identifyer", action = "store", required = True)
+parser.add_argument("-v", "--variantFile", help = "Path of input file containing chr and variant identifyer", action="store", required=True)
 parser.add_argument("-m", "--mode", help = "possible values: \"geno\", \"imp\" or \"wes\"", action = "store", required = True)
 parser.add_argument("-o", "--output", help = "name of output file", action = "store", required = True)
 parser.add_argument("-e", "--exclude", help = "Path to exclude list. One PatId per line", action = "store", required = False)
@@ -227,7 +231,7 @@ def readInVarFile():
 def bgenToGen(bgenInFile, sampleInFile, genOutFile, sampleOutFile):
 	qcToolCmd = []
 	qcToolCmd.append(qcToolPath)
-	qcToolCmd.append("-g " + bgenOutFile)
+	qcToolCmd.append("-g " + bgenInFile)
 	qcToolCmd.append("-s " + sampleInFile)
 	qcToolCmd.append("-og " + genOutFile)
 	qcToolCmd.append("-os " + sampleOutFile)
@@ -442,23 +446,54 @@ if mode == "geno":
 if mode == "wes":
 
 	rsidChrMappingDict = readInVarFile()
-	rsidChrMappingDict = checkForVarIdsInInputfile(rsidChrMappingDict, False)
-
+	# rsidChrMappingDict = checkForVarIdsInInputfile(rsidChrMappingDict, False)
 
 	for chr in rsidChrMappingDict:
+		bgenixCmd = []
+		bgenFile =  glob.glob(wesPath + "/*chr"+ chr + ".bgen")[0]
+		bgenIndexFile = glob.glob(bgenFile + ".bgi")[0]
+		outFilePrefix = "chr" + chr
+		bgenOutFile = tmpDir + "/" + outFilePrefix + ".bgen"
+		sampleInFile = glob.glob(wesPath + "/*chr"+ chr + ".sample")[0]
 
-		bgenTmpFile = tmpDir + "/chr" + chr
-		sampleOutFile = tmpDir + "/chr" + chr + ".sample"
-		bgenOutFile = tmpDir + "/chr" + chr + ".bgen"
-		genOutFile = tmpDir + "/chr" + chr + ".gen"
+		bgenixCmd.append(bgenixPath)
+		bgenixCmd.append("-g " + bgenFile)
+		bgenixCmd.append("-i " + bgenIndexFile)
+		for rsId in rsidChrMappingDict[chr]:
+			bgenixCmd.append("-incl-rsids " + rsId)
+		bgenixCmd.append("> " + bgenOutFile)
+		separator = " "
+		if not cmdOnly:
+			returnValue = subprocess.call(" ".join(bgenixCmd), shell=True)
+			if returnValue != 0:
+				sys.exit("\n\n######## ERROR ########\nBGenix exited with non 0 status (" + str(returnValue) + "). Check your parameters.\n\n")
+		if cmdOnly:
+			print (" ".join(bgenixCmd))
+			print ("\n")
 
-		extractUsingPlink(wesBedFile, wesBimFile, wesFamFile, rsidChrMappingDict, bgenTmpFile)
+		#### transform bgen to gen and sample using gcTool
+		genOutFile = tmpDir + "/" + outFilePrefix + ".gen"
+		sampleOutFile = tmpDir + "/" + outFilePrefix + ".sample"
 
-		bgenToGen(bgenOutFile, sampleOutFile, genOutFile, sampleOutFile)
-
+		bgenToGen(bgenOutFile, sampleInFile, genOutFile, sampleOutFile)
 		writeOutFromGen()
+		checkForVarIdsInOutputFile(rsidChrMappingDict)
 
 
+		######## old version using bed bim fam
+		# print (rsidChrMappingDict)
+		# bgenTmpFile = tmpDir + "/chr" + chr
+		# sampleOutFile = tmpDir + "/chr" + chr + ".sample"
+		# bgenOutFile = tmpDir + "/chr" + chr + ".bgen"
+		# genOutFile = tmpDir + "/chr" + chr + ".gen"
+		#
+		# extractUsingPlink(wesBedFile, wesBimFile, wesFamFile, rsidChrMappingDict, bgenTmpFile)
+		#
+		# print (wesPath)
+
+		# bgenToGen(bgenInFile, sampleInFile, genOutFile, sampleOutFile)
+		#
+		# writeOutFromGen()
 
 
 
