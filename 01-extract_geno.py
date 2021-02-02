@@ -6,6 +6,7 @@ import argparse
 import glob
 import collections
 import os
+from os import listdir
 import subprocess
 import shutil
 from pathlib import Path
@@ -47,6 +48,11 @@ wesFamFile = wesDataPath + "ukb20272_efe_chr1_v1_s49959.fam"
 wesPath = "/data/studies/06_UKBB/01_Data/02_Genetic_Data/Exome_200k/BGEN_Format/output"
 
 
+#### Default exclusions
+exclusionsDefaultPath = "/data/studies/06_UKBB/01_Data/00_EXCLUSIONS/"
+
+
+
 
 
 #########################################
@@ -72,6 +78,16 @@ outFileName = args.output
 mode = args.mode
 excludeListPath = args.exclude
 cmdOnly = args.cmdOnly
+
+
+
+#### check if excludeListPath is set else use default file
+if not excludeListPath:
+	# print (glob.glob(exclusionsDefaultPath + "/*"))
+	excludeListPath = exclusionsDefaultPath + "/" + sorted(listdir(exclusionsDefaultPath))[-1]
+	args.exclude = excludeListPath
+
+
 
 
 
@@ -185,12 +201,13 @@ def writeOutFromGen():
 def readInExcludeList():
 	excludeList = list()
 	if not excludeListPath is None and os.path.isfile(excludeListPath):
-		print ("Reading in exclusion list:", excludeListPath)
 		with open(excludeListPath, "r") as input:
 			for row in input:
 				excludeList.append(row.rstrip())
 	else:
 		excludeList.append("")
+	# print ("\n".join(excludeList))
+	# sys.exit()
 	return excludeList
 
 
