@@ -18,14 +18,16 @@ import glob
 ######## predefined variables ########
 ######################################
 
-ukbbPhenoFilePath1 = "/dsk/data1/programs/scripts/UKBB/test_extract_pheno/ukb8974_new_head.csv"
-ukbbPhenoFilePath2 = "/dsk/data1/programs/scripts/UKBB/test_extract_pheno/ukb28633_new_head.csv"
+# ukbbPhenoFilePath1 = "/dsk/data1/programs/scripts/UKBB/test_extract_pheno/ukb8974_new_head.csv"
+# ukbbPhenoFilePath2 = "/dsk/data1/programs/scripts/UKBB/test_extract_pheno/ukb28633_new_head.csv"
+#
+# ukbbPhenoFilePath1 = "/data/studies/06_UKBB/UKBB_150k/01_Raw_Data/ukb8974.csv"
+# ukbbPhenoFilePath2 = "/data/studies/06_UKBB/Biomarkers/ukb28633.csv"
 
-ukbbPhenoFilePath1 = "/data/studies/06_UKBB/UKBB_150k/01_Raw_Data/ukb8974.csv"
-ukbbPhenoFilePath2 = "/data/studies/06_UKBB/Biomarkers/ukb28633.csv"
+ukbbPhenoFilePath = "/data/studies/06_UKBB/01_Data/01_Raw_Data/Appl_64806_Bask_45015_GE_2021/ukb45015.csv"
 
-
-exclusionsDefaultPath = "/data/studies/06_UKBB/EXCLUSIONS/"
+# exclusionsDefaultPath = "/data/studies/06_UKBB/EXCLUSIONS/"
+exclusionsDefaultPath = "/data/studies/06_UKBB/01_Data/00_EXCLUSIONS/"
 
 
 
@@ -50,10 +52,12 @@ excludeListPath = args.exclude
 
 #### check if excludeListPath is set else use default file
 if not excludeListPath:
-	# print (glob.glob(exclusionsDefaultPath + "*"))
+	# print (glob.glob(exclusionsDefaultPath + "/*"))
 	excludeListPath = exclusionsDefaultPath + "/" + sorted(listdir(exclusionsDefaultPath))[-1]
+	print (excludeListPath)
 	args.exclude = excludeListPath
 
+# sys.exit("HALLO")
 
 
 #### print out chosen options
@@ -94,14 +98,16 @@ def readInInputFile():
 		if (curLine.startswith("#") or curLine.isspace()):
 			continue
 		splitLine = curLine.replace("\n","").split("\t")
+		print (splitLine)
 		ukbbVar = splitLine[0]
 		outVar = splitLine[1]
 		ukbbVarMappingDict[ukbbVar] = outVar
 
 	#### check for corresponding UKBB phenotype file
 	print ("Checking and mapping variants in phenotpe files")
-	ukbbPhenoHeader1 = open(ukbbPhenoFilePath1, "r").readline().replace("\"", "").replace("\n","").split(",")
-	ukbbPhenoHeader2 = open(ukbbPhenoFilePath2, "r").readline().replace("\"", "").replace("\n","").split(",")
+	# ukbbPhenoHeader1 = open(ukbbPhenoFilePath1, "r").readline().replace("\"", "").replace("\n","").split(",")
+	# ukbbPhenoHeader2 = open(ukbbPhenoFilePath2, "r").readline().replace("\"", "").replace("\n","").split(",")
+	ukbbPhenoHeader = open(ukbbPhenoFilePath, "r").readline().replace("\"", "").replace("\n","").split(",")
 	nonMappedVar = list()
 
 	for curUkbbVar in ukbbVarMappingDict.keys():
@@ -112,21 +118,26 @@ def readInInputFile():
 			if (not re.search("\d+-\d+.*", mainString)):
 				print("\nERROR: Not allowed wildcard search. Check your input file.")
 				sys.exit(2)
-			if (any(s for s in ukbbPhenoHeader1 if mainString in s)):
-				wildCardMappingDict[curUkbbVar].append(list(s for s in ukbbPhenoHeader1 if mainString in s))
-				phenoPathVarNameMappingDict[ukbbPhenoFilePath1].append(curUkbbVar)
-			elif (any(s for s in ukbbPhenoHeader2 if mainString in s)):
-				wildCardMappingDict[curUkbbVar].append(s for s in ukbbPhenoHeader1 if mainString in s)
-				phenoPathVarNameMappingDict[ukbbPhenoFilePath2].append(curUkbbVar)
+			# if (any(s for s in ukbbPhenoHeader1 if mainString in s)):
+			# 	wildCardMappingDict[curUkbbVar].append(list(s for s in ukbbPhenoHeader1 if mainString in s))
+			# 	phenoPathVarNameMappingDict[ukbbPhenoFilePath1].append(curUkbbVar)
+			# elif (any(s for s in ukbbPhenoHeader2 if mainString in s)):
+			# 	wildCardMappingDict[curUkbbVar].append(s for s in ukbbPhenoHeader1 if mainString in s)
+			# 	phenoPathVarNameMappingDict[ukbbPhenoFilePath2].append(curUkbbVar)
+			if (any(s for s in ukbbPhenoHeader if mainString in s)):
+				wildCardMappingDict[curUkbbVar].append(list(s for s in ukbbPhenoHeader if mainString in s))
+				phenoPathVarNameMappingDict[ukbbPhenoFilePath].append(curUkbbVar)
 			else:
 				nonMappedVar.append(curUkbbVar)
 
 		#### sort normal variables
 		else:
-			if curUkbbVar in ukbbPhenoHeader1:
-				phenoPathVarNameMappingDict[ukbbPhenoFilePath1].append(curUkbbVar)
-			elif curUkbbVar in ukbbPhenoHeader2:
-				phenoPathVarNameMappingDict[ukbbPhenoFilePath2].append(curUkbbVar)
+			# if curUkbbVar in ukbbPhenoHeader1:
+			# 	phenoPathVarNameMappingDict[ukbbPhenoFilePath1].append(curUkbbVar)
+			# elif curUkbbVar in ukbbPhenoHeader2:
+			# 	phenoPathVarNameMappingDict[ukbbPhenoFilePath2].append(curUkbbVar)
+			if curUkbbVar in ukbbPhenoHeader:
+				phenoPathVarNameMappingDict[ukbbPhenoFilePath].append(curUkbbVar)
 			else:
 				nonMappedVar.append(curUkbbVar)
 

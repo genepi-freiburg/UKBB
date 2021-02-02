@@ -20,26 +20,31 @@ qcToolPath = "/data/programs/bin/gwas/qctool/qctool_v2.0.1/qctool_v2.0.1"
 
 
 #### imputed data
-impPath = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/EGAD00010001474/"
-impSampleFile = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/UKBB_500k_v3_clean.sample"
+#impPath = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/EGAD00010001474/"
+impPath = "/data/studies/06_UKBB/01_Data/01_Raw_Data/Appl_20272_Genetic_2018/EGAD00010001474/"
+#impSampleFile = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/UKBB_500k_v3_clean.sample"
+impSampleFile = "/data/studies/06_UKBB/01_Data/01_Raw_Data/Appl_20272_Genetic_2018/UKBB_500k_v3_clean.sample"
 
 #### genotyped data
-genoPath = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/EGAD00010001497/"
-genoFamPath = "/data/studies/06_UKBB/UKBB_500k/01_Raw_Data/genetic/ready_PLINK/ukb2027_cal_chr1_v2_s488366.fam"
+#genoPath = "/data/studies/06_UKBB/UKBB_500k_V3/01_Raw_Data/EGAD00010001497/"
+genoPath = "/data/studies/06_UKBB/01_Data/01_Raw_Data/Appl_20272_Genetic_2018/EGAD00010001497/"
+#genoFamPath = "/data/studies/06_UKBB/UKBB_500k/01_Raw_Data/genetic/ready_PLINK/ukb2027_cal_chr1_v2_s488366.fam"
+genoFamPath = "/data/studies/06_UKBB/01_Data/01_Raw_Data/Appl_20272_Genetic_2017/genetic/ready_PLINK/ukb2027_cal_chr1_v2_s488366.fam"
 plinkPath = "/data/programs/bin/gwas/plink/plink-2.0.0_alpha_20190724/plink2"
 
 
 
 
 #### WES data
-wesDataPath = "/data/studies/06_UKBB/Exome_50k/01_Raw_Data/EFE/"
+#wesDataPath = "/data/studies/06_UKBB/Exome_50k/01_Raw_Data/EFE/"
 # wesDataPath = "/data/studies/06_UKBB/Exome_200k/02_Genotypes/BGEN_Format/output/"
+wesDataPath = "/data/studies/06_UKBB/01_Data/01_Raw_Data/Appl_20272_Exome_50k/EFE/"
 wesBedFile = wesDataPath + "ukb_efe_chr1_v1.bed"
 wesBimFile = wesDataPath + "ukb_fe_exm_chrall_v1.bim"
 wesFamFile = wesDataPath + "ukb20272_efe_chr1_v1_s49959.fam"
 
-wesPath = "/data/studies/06_UKBB/Exome_200k/02_Genotypes/BGEN_Format/output"
-
+#wesPath = "/data/studies/06_UKBB/Exome_200k/02_Genotypes/BGEN_Format/output"
+wesPath = "/data/studies/06_UKBB/01_Data/02_Genetic_Data/Exome_200k/BGEN_Format/output"
 
 
 
